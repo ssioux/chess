@@ -17,7 +17,7 @@ const Board = () => {
       .split("\n")
       .slice(1, 9)
       .map((rank) => rank.slice(5, 27).split("  "));
-    console.log({ ranks, len: ranks[0].length });
+      setPieces(ranks)
   }, []);
 
   return (
@@ -33,7 +33,8 @@ const Board = () => {
                     (i + j) % 2 === 0 ? styles.w : styles.b,
                   ].join(" ")}
                   key={`${i}, ${j}`}
-                ></div>
+                >{pieces[i][j]}
+             </div>
               );
             })}
           </div>

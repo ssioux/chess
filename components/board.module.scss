@@ -2,13 +2,16 @@
   width: 100vmin;
   height: 100vmin;
   margin: auto;
+
   .row {
     display: flex;
     height: 12%;
+
   }
 
   .col {
     width: 12%;
+    color: red;
   }
   .b {
     background-color: black;
