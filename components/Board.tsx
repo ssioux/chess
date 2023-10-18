@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./board.module.scss";
 import { Chess } from "chess.js";
+import { initialPieces, blackPieces, whitePieces } from "../utils/chess-utils";
 
 const Board = () => {
   // represent the board
@@ -12,12 +13,12 @@ const Board = () => {
     // new Game
     const chess = new Chess();
     // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
-    const ranks = chess
+    const b = chess
       .ascii()
       .split("\n")
       .slice(1, 9)
       .map((rank) => rank.slice(5, 27).split("  "));
-      setPieces(ranks)
+    setPieces(b);
   }, []);
 
   return (
@@ -26,6 +27,16 @@ const Board = () => {
         return (
           <div className={styles.row} key={i}>
             {new Array(8).fill(0).map((_, j) => {
+              let p = pieces[i][j];
+              console.log("first", p)
+              if (p === ".") {
+                p = "";
+              } else if (p.match(/[A-Z]/)) {
+                p = whitePieces[initialPieces.indexOf(p.toLowerCase())]; // Changing letter by symbol, taking the index of initialPieces for take the index of the white pieces (the same with black pieces)
+              } else {
+                p = blackPieces[initialPieces.indexOf(p)];
+
+              }
               return (
                 <div
                   className={[
@@ -33,8 +44,9 @@ const Board = () => {
                     (i + j) % 2 === 0 ? styles.w : styles.b,
                   ].join(" ")}
                   key={`${i}, ${j}`}
-                >{pieces[i][j]}
-             </div>
+                >
+                  {p}
+                </div>
               );
             })}
           </div>
