@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./board.module.scss";
-import { Chess } from "chess.js";
-import { initialPieces, blackPieces, whitePieces } from "../utils/chess-utils";
+
+import { initialPieces, blackPieces, whitePieces, chess } from "../utils/chess-utils";
 
 const Board = () => {
   // represent the board
@@ -10,8 +10,7 @@ const Board = () => {
   );
 
   useEffect(() => {
-    // new Game
-    const chess = new Chess();
+
     // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
     const b = chess
       .ascii()
