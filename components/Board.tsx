@@ -14,21 +14,25 @@ const Board = () => {
     new Array(8).fill(0).map(() => new Array(8).fill(""))
   );
 
+  const [highlighted, setHighlighted] = useState<string[]>([]);
   useEffect(() => {
+
+    const getBoard = () => {
+      // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
+      setPieces(
+        chess
+          .ascii()
+          .split("\n")
+          .slice(1, 9)
+          .map((rank) => rank.slice(5, 27).split("  "))
+      );
+    };
+
+
     getBoard();
   }, []);
 
-  const getBoard = () => {
-    // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
-    setPieces(
-      chess
-        .ascii()
-        .split("\n")
-        .slice(1, 9)
-        .map((rank) => rank.slice(5, 27).split("  "))
-    );
-  };
-
+ 
   return (
     <div className={styles.board}>
       {new Array(8).fill(0).map((_, i) => {
@@ -37,7 +41,7 @@ const Board = () => {
             {new Array(8).fill(0).map((_, j) => {
               let p = pieces[i][j];
               let c = "";
-              if (p === ".") {
+              if (p == ".") {
                 p = "";
               } else if (p.match(/[A-Z]/)) {
                 p = whitePieces[initialPieces.indexOf(p.toLowerCase())]; // Changing letter by symbol, taking the index of initialPieces for take the index of the white pieces (the same with black pieces)
@@ -46,21 +50,24 @@ const Board = () => {
                 p = blackPieces[initialPieces.indexOf(p)];
                 c = "b";
               }
-              const position = `${"abcdefgh".charAt(j)}${8 - i}`;
+             
+              const square = `${"abcdefgh".charAt(j)}${8 - i}`;
               return (
                 <div
                   className={[
                     styles.col,
-                    (i + j) % 2 === 0 ? styles.w : styles.b,
+                    (i + j) % 2 == 0 ? styles.w : styles.b,
                     p && chess.turn() == c && styles.pointer,
+                    highlighted.includes(square) && styles.highlighted,
                   ].join(" ")}
                   key={`${i}, ${j}`}
                   onClick={() => {
                     // next posible position
                     // ignoring square ts error
                     // @ts-ignore
-                    const moves = chess.moves({ square: position, verbose: true });
-                    console.log(moves)
+                    const mvs = chess.moves({ square , verbose: true }) as Move[];
+                    setHighlighted(mvs.map(({ to }) => to));
+                 
                   }}
                 >
                   {p}
