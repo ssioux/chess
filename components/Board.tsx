@@ -16,23 +16,20 @@ const Board = () => {
 
   const [highlighted, setHighlighted] = useState<string[]>([]);
   useEffect(() => {
-
-    const getBoard = () => {
-      // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
-      setPieces(
-        chess
-          .ascii()
-          .split("\n")
-          .slice(1, 9)
-          .map((rank) => rank.slice(5, 27).split("  "))
-      );
-    };
-
-
     getBoard();
   }, []);
 
- 
+  const getBoard = () => {
+    // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
+    setPieces(
+      chess
+        .ascii()
+        .split("\n")
+        .slice(1, 9)
+        .map((rank) => rank.slice(5, 27).split("  "))
+    );
+  };
+
   return (
     <div className={styles.board}>
       {new Array(8).fill(0).map((_, i) => {
@@ -50,7 +47,7 @@ const Board = () => {
                 p = blackPieces[initialPieces.indexOf(p)];
                 c = "b";
               }
-             
+
               const square = `${"abcdefgh".charAt(j)}${8 - i}`;
               return (
                 <div
@@ -58,16 +55,32 @@ const Board = () => {
                     styles.col,
                     (i + j) % 2 == 0 ? styles.w : styles.b,
                     p && chess.turn() == c && styles.pointer,
-                    highlighted.includes(square) && styles.highlighted,
+                    highlighted.slice(1).includes(square) && styles.highlighted,
                   ].join(" ")}
                   key={`${i}, ${j}`}
                   onClick={() => {
-                    // next posible position
-                    // ignoring square ts error
-                    // @ts-ignore
-                    const mvs = chess.moves({ square , verbose: true }) as Move[];
-                    setHighlighted(mvs.map(({ to }) => to));
-                 
+                    if (highlighted.slice(1).includes(square)) {
+                      chess.move({ to: square, from: highlighted[0] });
+                      setPieces(
+                        chess
+                          .ascii()
+                          .split("\n")
+                          .slice(1, 9)
+                          .map((rank) => rank.slice(5, 27).split("  "))
+                      );
+                      setHighlighted([]);
+                    } else if (p && chess.turn() == c) {
+                      const mvs = chess.moves({
+                        // @ts-ignore
+                        square,
+                        verbose: true,
+                        // @ts-ignore
+                      }) as Move[];
+                      // @ts-ignore
+                      setHighlighted([square, ...mvs.map(({ to }) => to)]);
+                    } else {
+                      setHighlighted([]);
+                    }
                   }}
                 >
                   {p}

@@ -6,16 +6,15 @@
   .row {
     display: flex;
     height: 12%;
-
   }
 
   .col {
     width: 12%;
     color: red;
-    font-size: 12.5vmin;
+    font-size: 12vmin;
   }
   .b {
-    background-color: black;
+    background-color: rgb(0, 0, 0);
   }
   .w {
     background-color: white;
@@ -28,12 +27,13 @@
 
 .highlighted {
   position: relative;
+  cursor: pointer;
   &::before {
-    content: ' ';
+    content: " ";
     position: absolute;
     top: 0;
     right: 0;
-   bottom: 0;
+    bottom: 0;
     left: 0;
     background-image: radial-gradient(red, transparent, transparent);
   }
