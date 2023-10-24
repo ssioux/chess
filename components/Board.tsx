@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./board.module.scss";
+import { Move } from "chess.js";
+import { calculateBestMove, initGame } from "chess-ai";
 
 import {
   initialPieces,
@@ -16,6 +18,7 @@ const Board = () => {
 
   const [highlighted, setHighlighted] = useState<string[]>([]);
   useEffect(() => {
+    initGame(chess, 1); //  chess, ai-difficulty from 0 to 2
     getBoard();
   }, []);
 
@@ -61,6 +64,8 @@ const Board = () => {
                   onClick={() => {
                     if (highlighted.slice(1).includes(square)) {
                       chess.move({ to: square, from: highlighted[0] });
+                      const aiMove = calculateBestMove();
+                      if (aiMove) chess.move(aiMove);
                       setPieces(
                         chess
                           .ascii()
@@ -74,9 +79,7 @@ const Board = () => {
                         // @ts-ignore
                         square,
                         verbose: true,
-                        // @ts-ignore
                       }) as Move[];
-                      // @ts-ignore
                       setHighlighted([square, ...mvs.map(({ to }) => to)]);
                     } else {
                       setHighlighted([]);
