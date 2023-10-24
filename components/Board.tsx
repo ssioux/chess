@@ -17,7 +17,7 @@ const Board = () => {
     new Array(8).fill(0).map(() => new Array(8).fill(""))
   );
   // next movements
-  const [highlighted, setHighlighted] = useState<string[]>([]);
+  const [highlighted, setHighlighted] = useState<(string | undefined)[]>([]);
   // Loader delay
   const [isLoading, setIsLoading] = useState(false);
   // web worker - https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
@@ -75,7 +75,7 @@ const Board = () => {
                     styles.col,
                     (i + j) % 2 == 0 ? styles.w : styles.b,
                     p && chess.turn() == c && styles.pointer,
-                    highlighted.slice(1).includes(square) && styles.highlighted,
+                    highlighted.includes(square) && styles.highlighted,
                   ].join(" ")}
                   key={`${i}, ${j}`}
                   onClick={() => {
@@ -86,9 +86,11 @@ const Board = () => {
                       //ai-movement delay
                       setTimeout(() => {
                         const aiMove = calculateBestMove();
-                        if (aiMove) chess.move(aiMove);
-                        getBoard();
-                        setHighlighted([]);
+                        if (aiMove) {
+                          const move = chess.move(aiMove);
+                          getBoard();
+                          setHighlighted([move?.to, move?.from]);
+                        }
                         setIsLoading(false);
                       }, 2000);
                     } else if (p && chess.turn() == c) {
