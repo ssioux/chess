@@ -2,14 +2,19 @@
   width: 100vmin;
   height: 100vmin;
   margin: auto;
+  border: 10px solid green;
+  border-style: groove;
 
   .row {
     display: flex;
-    height: 12%;
+    height: 12.5%;
   }
 
   .col {
-    width: 12%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 12.5%;
     color: red;
     font-size: 10vmin;
   }
