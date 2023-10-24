@@ -16,8 +16,10 @@ const Board = () => {
   const [pieces, setPieces] = useState(
     new Array(8).fill(0).map(() => new Array(8).fill(""))
   );
-
+  // next movements
   const [highlighted, setHighlighted] = useState<string[]>([]);
+  // Loader
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     initGame(chess, 1); //  chess, ai-difficulty from 0 to 2
     getBoard();
@@ -65,16 +67,17 @@ const Board = () => {
                   onClick={() => {
                     if (highlighted.slice(1).includes(square)) {
                       chess.move({ to: square, from: highlighted[0] });
-                      const aiMove = calculateBestMove();
-                      if (aiMove) chess.move(aiMove);
-                      setPieces(
-                        chess
-                          .ascii()
-                          .split("\n")
-                          .slice(1, 9)
-                          .map((rank) => rank.slice(5, 27).split("  "))
-                      );
-                      setHighlighted([]);
+                      getBoard();
+                      setIsLoading(true);
+                      //ai-movement delay
+                      setTimeout(() => {
+                        const aiMove = calculateBestMove();
+                        if (aiMove) chess.move(aiMove);
+                        getBoard();
+                        setHighlighted([]);
+                        setIsLoading(false);
+                      }, 2000);
+
                     } else if (p && chess.turn() == c) {
                       const mvs = chess.moves({
                         // @ts-ignore
@@ -94,7 +97,7 @@ const Board = () => {
           </div>
         );
       })}
-      <Loader/>
+      <Loader hidden={!isLoading} />
     </div>
   );
 };
