@@ -9,6 +9,7 @@ import {
   whitePieces,
   chess,
 } from "../utils/chess-utils";
+import Loader from "./Loader";
 
 const Board = () => {
   // represent the board
@@ -93,6 +94,7 @@ const Board = () => {
           </div>
         );
       })}
+      <Loader/>
     </div>
   );
 };
