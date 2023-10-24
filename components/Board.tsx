@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./board.module.scss";
 import { Move } from "chess.js";
 import { calculateBestMove, initGame } from "chess-ai";
@@ -18,11 +18,25 @@ const Board = () => {
   );
   // next movements
   const [highlighted, setHighlighted] = useState<string[]>([]);
-  // Loader
+  // Loader delay
   const [isLoading, setIsLoading] = useState(false);
+  // web worker - https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+  const workerRef = useRef<Worker>();
+
   useEffect(() => {
-    initGame(chess, 1); //  chess, ai-difficulty from 0 to 2
+    workerRef.current = new Worker(
+      new URL("../utils/worker.ts", import.meta.url)
+    );
+    workerRef.current.onmessage = (e: MessageEvent) => {
+      console.log("Hi from UI", e);
+    };
+    workerRef.current.postMessage("Hi -- from UI");
+    initGame(chess, 2); //  chess, ai-difficulty from 0 to 2
     getBoard();
+
+    return () => {
+      workerRef.current?.terminate();
+    };
   }, []);
 
   const getBoard = () => {
@@ -77,7 +91,6 @@ const Board = () => {
                         setHighlighted([]);
                         setIsLoading(false);
                       }, 2000);
-
                     } else if (p && chess.turn() == c) {
                       const mvs = chess.moves({
                         // @ts-ignore
