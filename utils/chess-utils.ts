@@ -7,10 +7,11 @@ export const pw = "♖♘♗♕♔♙";
 
 // new Game
 export const chess = new Chess();
-
+// Position
 export const files = "abcdefgh".split("");
 export const ranks = "87654321".split("");
 
+// board
 export const getBoard = () =>
   chess
     .ascii()

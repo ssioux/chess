@@ -7,16 +7,26 @@ import Loader from "./Loader";
 import Cell from "./Cell";
 
 const Board = () => {
+
+  // pieces of the game
   const [pieces, setPieces] = useState<string[][]>(
     ranks.map(() => new Array(8).fill(" "))
   );
+  // web worker
   const workerRef = useRef<Worker>();
+  // posible next movements
   const [highlighted, setHighlighted] = useState<(string | undefined)[]>([]);
+  // AI delay
   const [isLoading, setIsLoading] = useState(false);
+  // player turn
   const [turn, setTurn] = useState("w");
+  // king in check
   const [inCheck, setInCheck] = useState(false);
+  // pawn promoted to queen
   const [movesWithPromotion, setMovesWithPromotion] = useState<string[]>([]);
-  const isTwoPlayer = false;
+  // two players game or AI
+  const isTwoPlayer = true;
+  
   useEffect(() => {
     workerRef.current = new Worker(
       new URL("../utils/worker.ts", import.meta.url)
