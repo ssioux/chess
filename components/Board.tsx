@@ -1,31 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./board.module.scss";
+import { chess, getBoard, ranks, files } from "../utils/chess-utils";
 import { Move } from "chess.js";
 import { calculateBestMove, initGame } from "chess-ai";
-
-import {
-  initialPieces,
-  blackPieces,
-  whitePieces,
-  chess,
-} from "../utils/chess-utils";
 import Loader from "./Loader";
+import Cell from "./Cell";
 
 const Board = () => {
-  // represent the board
-  const [pieces, setPieces] = useState(
-    new Array(8).fill(0).map(() => new Array(8).fill(""))
+  const [pieces, setPieces] = useState<string[][]>(
+    ranks.map(() => new Array(8).fill(" "))
   );
-  // next movements
-  const [highlighted, setHighlighted] = useState<(string | undefined)[]>([]);
-  // Loader delay
-  const [isLoading, setIsLoading] = useState(false);
-  // web worker - https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
   const workerRef = useRef<Worker>();
-  // color turn
-  const [color, setColor] = useState("b");
-  // inCheck alert
+  const [highlighted, setHighlighted] = useState<(string | undefined)[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [turn, setTurn] = useState("w");
   const [inCheck, setInCheck] = useState(false);
+  const [movesWithPromotion, setMovesWithPromotion] = useState<string[]>([]);
+  const isTwoPlayer = false;
   useEffect(() => {
     workerRef.current = new Worker(
       new URL("../utils/worker.ts", import.meta.url)
@@ -34,102 +25,92 @@ const Board = () => {
       console.log("Hi from UI", e);
     };
     workerRef.current.postMessage("Hi -- from UI");
-    initGame(chess, 2); //  chess, ai-difficulty from 0 to 2
-    getBoard();
-
+    initGame(chess, 1);
+    setPieces(getBoard());
     return () => {
       workerRef.current?.terminate();
     };
   }, []);
 
-  const getBoard = () => {
-    // ascii square with lines removed, each rank sliced from idx 5 until 27 + 2 spaces between letters removed adding converting into str.
-    setPieces(
-      chess
-        .ascii()
-        .split("\n")
-        .slice(1, 9)
-        .map((rank) => rank.slice(5, 27).split("  "))
-    );
-  };
+  function makeMove(mv: any, isAI: boolean) {
+    let move;
+    if (!isAI && movesWithPromotion.includes(mv.to)) {
+      chess.move({ ...mv, promotion: "q" });
+    } else move = chess.move(mv);
+    setPieces(getBoard());
+    setHighlighted([move?.to, move?.from]);
+    setIsLoading(!isAI);
+    setTurn(chess.turn());
+    setInCheck(chess.inCheck());
+    if (chess.isGameOver()) {
+      setTimeout(() => {
+        alert("Game Over");
+        chess.reset();
+        setTurn("b");
+        setInCheck(false);
+        setPieces(getBoard());
+        setHighlighted([]);
+        setIsLoading(false);
+      }, 100);
+    }
+  }
 
-  const makeMove = (move: any, isAI: boolean) => {};
-
+  function handleCellClick(square: string, shouldGetMoves: boolean) {
+    if (highlighted.slice(1).includes(square)) {
+      makeMove(
+        {
+          to: square,
+          // @ts-ignore
+          from: highlighted[0],
+        },
+        false
+      );
+      if (isTwoPlayer) {
+        setIsLoading(false);
+      } else
+        setTimeout(() => {
+          const aiMove = calculateBestMove();
+          if (aiMove) makeMove(aiMove, true);
+        }, 200);
+    } else if (shouldGetMoves) {
+      const mvs = chess.moves({
+        // @ts-ignore
+        square,
+        verbose: true,
+      }) as Move[];
+      setHighlighted([square, ...mvs.map(({ to }) => to)]);
+      setMovesWithPromotion(
+        mvs.filter(({ flags }) => flags.includes("p")).map(({ to }) => to)
+      );
+    } else {
+      setHighlighted([]);
+    }
+  }
   return (
     <div
       className={[
         styles.board,
-        color == "w" ? styles.turnb : styles.turnw,
+        turn == "b" ? styles.tb : styles.tw,
         inCheck ? styles.inCheck : "",
       ].join(" ")}
     >
-      {new Array(8).fill(0).map((_, i) => {
-        return (
-          <div className={styles.row} key={i}>
-            {new Array(8).fill(0).map((_, j) => {
-              let p = pieces[i][j];
-              let c = "";
-              if (p == ".") {
-                p = "";
-              } else if (p.match(/[A-Z]/)) {
-                p = whitePieces[initialPieces.indexOf(p.toLowerCase())]; // Changing letter by symbol, taking the index of initialPieces for take the index of the white pieces (the same with black pieces)
-                c = "w";
-              } else {
-                p = blackPieces[initialPieces.indexOf(p)];
-                c = "b";
-              }
-
-              const square = `${"abcdefgh".charAt(j)}${8 - i}`;
-              return (
-                <div
-                  className={[
-                    styles.col,
-                    (i + j) % 2 == 0 ? styles.w : styles.b,
-                    p && chess.turn() == c && styles.pointer,
-                    highlighted.includes(square) && styles.highlighted,
-                  ].join(" ")}
-                  key={`${i}, ${j}`}
-                  onClick={() => {
-                    if (highlighted.slice(1).includes(square)) {
-                      const mover = chess.move({
-                        to: square,
-                        // @ts-ignore
-                        from: highlighted[0],
-                      });
-                      getBoard();
-                      setIsLoading(true);
-                      setColor(mover?.color || "w");
-                      setInCheck(chess.inCheck());
-                      //ai-movement delay
-                      setTimeout(() => {
-                        const aiMove = calculateBestMove();
-                        if (aiMove) {
-                          const move = chess.move(aiMove);
-                          getBoard();
-                          setHighlighted([move?.to, move?.from]);
-                          setColor(move?.color || "b");
-                        }
-                        setIsLoading(false);
-                      }, 2000);
-                    } else if (p && chess.turn() == c) {
-                      const mvs = chess.moves({
-                        // @ts-ignore
-                        square,
-                        verbose: true,
-                      }) as Move[];
-                      setHighlighted([square, ...mvs.map(({ to }) => to)]);
-                    } else {
-                      setHighlighted([]);
-                    }
-                  }}
-                >
-                  {p}
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+      {ranks.map((rank, i) => (
+        <div className={styles.row} key={i}>
+          {files.map((file, j) => (
+            <Cell
+              key={`${i},${j}`}
+              {...{
+                piece: pieces[i][j],
+                square: file + rank,
+                handleCellClick,
+                highlighted,
+                turn,
+                isWhite: (i + j) % 2 == 0,
+              }}
+            />
+          ))}
+        </div>
+      ))}
       <Loader hidden={!isLoading} />
     </div>
   );
