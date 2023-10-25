@@ -22,7 +22,8 @@ const Board = () => {
   const [isLoading, setIsLoading] = useState(false);
   // web worker - https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
   const workerRef = useRef<Worker>();
-
+  // color turn
+  const [color, setColor] = useState("b");
   useEffect(() => {
     workerRef.current = new Worker(
       new URL("../utils/worker.ts", import.meta.url)
@@ -51,7 +52,7 @@ const Board = () => {
   };
 
   return (
-    <div className={styles.board}>
+    <div className={[styles.board, color == "b" ? styles.turnb : styles.turnw].join(" ")}>
       {new Array(8).fill(0).map((_, i) => {
         return (
           <div className={styles.row} key={i}>
@@ -80,9 +81,15 @@ const Board = () => {
                   key={`${i}, ${j}`}
                   onClick={() => {
                     if (highlighted.slice(1).includes(square)) {
-                      chess.move({ to: square, from: highlighted[0] });
+                     
+                      const mover = chess.move({
+                        to: square,
+                         // @ts-ignore
+                        from: highlighted[0],
+                      });
                       getBoard();
                       setIsLoading(true);
+                      setColor(mover?.color || "w");
                       //ai-movement delay
                       setTimeout(() => {
                         const aiMove = calculateBestMove();
@@ -90,6 +97,7 @@ const Board = () => {
                           const move = chess.move(aiMove);
                           getBoard();
                           setHighlighted([move?.to, move?.from]);
+                          setColor(mover?.color || "b");
                         }
                         setIsLoading(false);
                       }, 2000);
