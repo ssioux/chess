@@ -24,6 +24,8 @@ const Board = () => {
   const workerRef = useRef<Worker>();
   // color turn
   const [color, setColor] = useState("b");
+  // inCheck alert
+  const [inCheck, setInCheck] = useState(false);
   useEffect(() => {
     workerRef.current = new Worker(
       new URL("../utils/worker.ts", import.meta.url)
@@ -51,8 +53,16 @@ const Board = () => {
     );
   };
 
+  const makeMove = (move: any, isAI: boolean) => {};
+
   return (
-    <div className={[styles.board, color == "b" ? styles.turnb : styles.turnw].join(" ")}>
+    <div
+      className={[
+        styles.board,
+        color == "w" ? styles.turnb : styles.turnw,
+        inCheck ? styles.inCheck : "",
+      ].join(" ")}
+    >
       {new Array(8).fill(0).map((_, i) => {
         return (
           <div className={styles.row} key={i}>
@@ -81,15 +91,15 @@ const Board = () => {
                   key={`${i}, ${j}`}
                   onClick={() => {
                     if (highlighted.slice(1).includes(square)) {
-                     
                       const mover = chess.move({
                         to: square,
-                         // @ts-ignore
+                        // @ts-ignore
                         from: highlighted[0],
                       });
                       getBoard();
                       setIsLoading(true);
                       setColor(mover?.color || "w");
+                      setInCheck(chess.inCheck());
                       //ai-movement delay
                       setTimeout(() => {
                         const aiMove = calculateBestMove();
@@ -97,7 +107,7 @@ const Board = () => {
                           const move = chess.move(aiMove);
                           getBoard();
                           setHighlighted([move?.to, move?.from]);
-                          setColor(mover?.color || "b");
+                          setColor(move?.color || "b");
                         }
                         setIsLoading(false);
                       }, 2000);

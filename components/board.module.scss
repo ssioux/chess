@@ -9,6 +9,9 @@
   &.turnb {
     border-top: 1.5vmin ridge orangered;
   }
+  &.inCheck {
+    box-shadow: 0 0 5px 10px red;
+  }
 
   .row {
     display: flex;
