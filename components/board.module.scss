@@ -1,50 +1,114 @@
-.board {
-  width: 100vmin;
-  height: 100vmin;
-  margin: auto;
-  border: 1.5vmin ridge rgba(153, 205, 50, 0.658);
-  &.tw {
-    border-bottom: 1.5vmin ridge orangered;
-  }
-  &.tb {
-    border-top: 1.5vmin ridge orangered;
-  }
-  &.inCheck {
-    box-shadow: 0 0 5px 1500px #f005;
-  }
-  .row {
-    display: flex;
-    height: 12.5%;
-  }
-  .col {
-    width: 12.5%;
-    color: red;
-    font-size: 10vmin;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .b {
-    background-color: black;
-  }
-  .w {
-    background-color: white;
+
+.chessPage {
+
+  position: initial;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  .board {
+    .btnGroup {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+
+      p {
+        color: rgb(209, 54, 54);
+        font-size: 1.5rem;
+        font-family: 'Coolvetica', 'Lucida Sans Regular', 'Lucida Grande',
+          'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        margin: 15px;
+      }
+
+      .chessBtn {
+        cursor: pointer;
+        background-color: #961c1c;
+        font-size: 1.7rem;
+        font-family: 'Times New Roman', Times, serif;
+        color: #fff;
+        width: 100px;
+        border-radius: 5px;
+        margin: 0px 15px 15px 15px;
+        border: 3px ridge #022c4360;
+      }
+      .chessBtnPhone {
+        cursor: pointer;
+        background-color: #961c1c;
+        font-size: 1.7rem;
+        font-family: 'Times New Roman', Times, serif;
+        color: #fff;
+        width: 80px;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0px;
+        height: 30px;
+      }
+      .chessBtnBottom {
+        cursor: pointer;
+        background-color: #961c1c;
+        font-size: 1.7rem;
+        font-family: 'Times New Roman', Times, serif;
+        color: #fff;
+        width: 80px;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0px;
+        height: 30px;
+      }
+
+      .activeBtn {
+        cursor: pointer;
+        background-color: #fff;
+        font-size: 1.7rem;
+        font-family: 'Times New Roman', Times, serif;
+        color: #961c1c;
+        width: 100px;
+        border-radius: 5px;
+        margin: 0px 15px 15px 15px;
+        border: 3px ridge #961c1c;
+      }
+      .activeBtnPhone {
+        cursor: pointer;
+        background-color: #fff;
+        font-size: 1.7rem;
+        font-family: 'Times New Roman', Times, serif;
+        color: #961c1c;
+        width: 80px;
+        border-radius: 5px;
+        margin: 3px;
+        padding: 0px;
+        height: 30px;
+        border: 3px ridge #961c1c;
+      }
+
+      .activeBtn:hover {
+        color: #961c1c;
+        background-color: #fff;
+      }
+
+      .chessBtn:hover {
+        color: #961c1c;
+        background-color: #fff;
+      }
+
+      .chessBtnPhone:focus {
+        background-color: #fff;
+        color: #961c1c;
+        border: 3px solid #961c1c;
+      }
+    }
+
+    .bordered {
+      border: none;
+    }
+    .onCheck {
+      border: 6px ridge red;
+      border-radius: 5px;
+    }
   }
 }
 
-.pointer {
-  cursor: pointer;
-}
-.highlighted {
-  position: relative;
-  cursor: pointer;
-  &::before {
-    content: " ";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-image: radial-gradient(red, transparent, transparent);
-  }
+@media screen and (max-width: 1200px) {
+
 }
