@@ -1,5 +1,8 @@
 html,
 body {
+  background-image: url("../public/images/stars.jpg");
+  background-size: cover;
+  background-color: black;
   padding: 0;
   margin: 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -31,6 +34,6 @@ a {
 
   body {
     color: white;
-    background: black;
+  
   }
 }

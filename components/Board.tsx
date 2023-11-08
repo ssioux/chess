@@ -191,7 +191,7 @@ const Board = () => {
                 borderRadius: "5px",
                 boxShadow: "0 5px 15px rgba(0, 0, 0, 0.5 ",
               }}
-              customDarkSquareStyle={{ backgroundColor: "#961C1C" }}
+              customDarkSquareStyle={{ backgroundColor: "#0D77B7" }}
               customLightSquareStyle={{ backgroundColor: "#fff" }}
               position={game.fen()}
               onPieceDrop={onDrop}
