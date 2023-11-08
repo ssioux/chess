@@ -111,7 +111,7 @@ const Board = () => {
     });
   }
   //Movement of computer
-  function makeRandomMove() {
+  function makeAiMove() {
     const possibleMove = game.moves();
     // 1. Draw
     if (game.in_draw() || game.in_stalemate()) {
@@ -161,7 +161,7 @@ const Board = () => {
     // 1. illegal move
     if (move == null) return false;
     // 2. move for ai
-    setTimeout(makeRandomMove, 200);
+    setTimeout(makeAiMove, 200);
 
     return true;
   }
